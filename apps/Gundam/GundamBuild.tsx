@@ -43,7 +43,13 @@ const GUNDAM_PARTS: Part[] = [
   { id: 'rifle', name: '빔 라이플 (Rifle)', position: [-1.8, 1.2, 1], rotation: [Math.PI / 2, 0, 0], scale: [0.2, 0.2, 3], color: '#475569', type: 'cylinder' },
 ];
 
-const RobotPart = ({ part, assembled, isActive, isLastAdded }: { part: Part, assembled: boolean, isActive: boolean, isLastAdded: boolean }) => {
+// Fix: Use React.FC to properly handle standard React props like 'key'
+const RobotPart: React.FC<{
+  part: Part;
+  assembled: boolean;
+  isActive: boolean;
+  isLastAdded: boolean;
+}> = ({ part, assembled, isActive, isLastAdded }) => {
   const meshRef = useRef<THREE.Mesh>(null);
   
   useFrame((state, delta) => {
@@ -97,7 +103,11 @@ const RobotPart = ({ part, assembled, isActive, isLastAdded }: { part: Part, ass
   );
 };
 
-const AssemblyScene = ({ assembledParts, activePartIdx }: { assembledParts: string[], activePartIdx: number }) => {
+// Fix: Use React.FC for consistent typing and handling of standard props
+const AssemblyScene: React.FC<{
+  assembledParts: string[];
+  activePartIdx: number;
+}> = ({ assembledParts, activePartIdx }) => {
   return (
     <>
       <PerspectiveCamera makeDefault position={[0, 2, 10]} fov={50} />

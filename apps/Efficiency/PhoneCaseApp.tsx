@@ -1,20 +1,32 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { BackButton } from '../../components/BackButton';
 
-const COLORS = ['#ffffff', '#18181b', '#f43f5e', '#3b82f6', '#10b981', '#fbbf24', '#8b5cf6', '#a78bfa', '#ffedd5'];
+const COLORS = ['#ffffff', '#000000', '#f43f5e', '#3b82f6', '#10b981', '#fbbf24', '#8b5cf6', '#a78bfa', '#ffedd5', '#1e293b'];
 const MATERIALS = [
-  { id: 'GLOSSY', label: '광택 (Glossy)', style: 'backdrop-blur-none bg-opacity-100' },
-  { id: 'MATTE', label: '무광 (Matte)', style: 'brightness-90 saturate-50' },
-  { id: 'FROSTED', label: '프로스트 (Frosted)', style: 'opacity-80 backdrop-blur-sm' },
+  { id: 'GLOSSY', label: '유광 (Glossy)', style: 'bg-opacity-100 shadow-[inset_0_2px_10px_rgba(255,255,255,0.3)]' },
+  { id: 'MATTE', label: '무광 (Matte)', style: 'brightness-90 contrast-75 saturate-50' },
+  { id: 'AURORA', label: '오로라 (Aurora)', style: 'bg-gradient-to-tr from-pink-400/30 via-sky-300/30 to-purple-400/30 animate-pulse' },
+  { id: 'LEATHER', label: '가죽 (Leather)', style: 'bg-[url("https://www.transparenttextures.com/patterns/leather.png")] opacity-40' },
+  { id: 'GLASS', label: '강화유리 (Glass)', style: 'backdrop-blur-sm bg-white/10 border border-white/20' },
 ];
-const STICKERS = ['⭐', '❤️', '🔥', '✨', '⚡', '🍀', '🍎', '🌈', '🍕', '🐱', '🎮', '🛸', '👾', '💎', '🎨'];
+const STICKERS = ['⭐', '❤️', '🔥', '✨', '⚡', '🍀', '🍎', '🌈', '🍕', '🐱', '🎮', '🛸', '👾', '💎', '🎨', '🚀', '🎸', '🍩', '🍔', '🍦', '🌸', '🐳', '☀️', '🌙'];
+
+interface StickerInstance {
+  id: number;
+  char: string;
+  x: number;
+  y: number;
+  rotation: number;
+  scale: number;
+}
 
 export const PhoneCaseApp: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-  const [caseColor, setCaseColor] = useState('#ffffff');
+  const [caseColor, setCaseColor] = useState('#1e293b');
   const [material, setMaterial] = useState(MATERIALS[0]);
-  const [stickers, setStickers] = useState<{id: number, char: string, x: number, y: number, rotation: number, scale: number}[]>([]);
+  const [stickers, setStickers] = useState<StickerInstance[]>([]);
   const [activeSticker, setActiveSticker] = useState<string | null>(null);
+  const [selectedStickerId, setSelectedStickerId] = useState<number | null>(null);
 
   const addSticker = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!activeSticker) return;
@@ -22,162 +34,171 @@ export const PhoneCaseApp: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     
-    setStickers([...stickers, { 
+    const newSticker = { 
       id: Date.now(), 
       char: activeSticker, 
       x, 
       y, 
-      rotation: (Math.random() - 0.5) * 40,
-      scale: 0.8 + Math.random() * 0.4
-    }]);
+      rotation: 0,
+      scale: 1.0
+    };
+    setStickers([...stickers, newSticker]);
+    setSelectedStickerId(newSticker.id);
   };
 
-  const removeSticker = (id: number) => {
-    setStickers(stickers.filter(s => s.id !== id));
+  const updateSelectedSticker = (updates: Partial<StickerInstance>) => {
+    if (selectedStickerId === null) return;
+    setStickers(stickers.map(s => s.id === selectedStickerId ? { ...s, ...updates } : s));
   };
+
+  const removeSelected = () => {
+    if (selectedStickerId === null) return;
+    setStickers(stickers.filter(s => s.id !== selectedStickerId));
+    setSelectedStickerId(null);
+  };
+
+  const selectedSticker = stickers.find(s => s.id === selectedStickerId);
 
   return (
-    <div className="w-full h-full bg-[#fef2f2] flex font-sans overflow-hidden relative">
+    <div className="w-full h-full bg-[#050506] flex font-sans overflow-hidden relative text-white">
       <BackButton onClick={onBack} />
       
-      {/* Sidebar Controls */}
-      <aside className="w-[380px] bg-white border-r border-zinc-200 flex flex-col p-10 z-30 shadow-2xl relative">
-        <div className="mb-12 mt-8">
-          <h1 className="text-4xl font-black text-rose-500 italic tracking-tighter leading-none uppercase">Case Studio</h1>
-          <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mt-4">Premium Customization Tool</p>
-          <div className="h-1 w-12 bg-rose-500 mt-4 rounded-full"></div>
+      {/* Sidebar Toolset */}
+      <aside className="w-[380px] bg-[#0f0f11] border-r border-white/5 flex flex-col p-8 z-30 shadow-2xl relative overflow-y-auto custom-scrollbar">
+        <div className="mb-10 mt-12">
+          <h1 className="text-2xl font-black italic tracking-tighter uppercase text-white leading-none">CASE STUDIO <span className="text-indigo-500">PRO</span></h1>
+          <p className="text-[9px] font-bold text-zinc-500 uppercase tracking-[0.3em] mt-2">Premium Customizer v5.0</p>
         </div>
 
-        <div className="flex-1 space-y-12 overflow-y-auto custom-scrollbar pr-4">
+        <div className="space-y-10">
           <section>
-            <h2 className="text-[11px] font-black uppercase text-zinc-400 mb-5 tracking-widest flex items-center gap-2">
-              <span className="w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
-              Color Palette
+            <h2 className="text-[10px] font-black uppercase text-zinc-500 mb-5 tracking-widest flex items-center gap-2">
+              <span className="w-4 h-px bg-zinc-800"></span> 01. Color Palette
             </h2>
-            <div className="grid grid-cols-5 gap-3">
+            <div className="grid grid-cols-5 gap-2.5">
               {COLORS.map(c => (
-                <button 
-                  key={c}
-                  onClick={() => setCaseColor(c)}
-                  className={`w-full aspect-square rounded-full border-4 transition-all hover:scale-110 shadow-sm ${caseColor === c ? 'border-rose-500 scale-110 shadow-lg' : 'border-zinc-50'}`}
-                  style={{ backgroundColor: c }}
-                />
+                <button key={c} onClick={() => setCaseColor(c)} className={`w-full aspect-square rounded-full border-2 transition-all ${caseColor === c ? 'border-indigo-500 scale-110 shadow-[0_0_15px_rgba(99,102,241,0.5)]' : 'border-white/10 hover:border-white/30'}`} style={{ backgroundColor: c }} />
               ))}
             </div>
           </section>
 
           <section>
-            <h2 className="text-[11px] font-black uppercase text-zinc-400 mb-5 tracking-widest flex items-center gap-2">
-              <span className="w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
-              Material Texture
+            <h2 className="text-[10px] font-black uppercase text-zinc-500 mb-5 tracking-widest flex items-center gap-2">
+              <span className="w-4 h-px bg-zinc-800"></span> 02. Finish & Material
             </h2>
-            <div className="space-y-2">
+            <div className="grid grid-cols-1 gap-2">
               {MATERIALS.map(m => (
                 <button 
-                  key={m.id}
-                  onClick={() => setMaterial(m)}
-                  className={`w-full py-4 px-6 text-left rounded-2xl border-2 font-black text-sm transition-all ${material.id === m.id ? 'bg-zinc-900 text-white border-zinc-900 shadow-xl' : 'bg-zinc-50 border-transparent hover:bg-zinc-100 text-zinc-500'}`}
+                  key={m.id} 
+                  onClick={() => setMaterial(m)} 
+                  className={`py-3.5 px-5 text-left rounded-xl border font-bold text-[11px] transition-all flex justify-between items-center ${material.id === m.id ? 'bg-indigo-600/20 text-indigo-400 border-indigo-500/50 shadow-lg' : 'bg-white/5 border-transparent hover:bg-white/10 text-zinc-500'}`}
                 >
                   {m.label}
+                  {material.id === m.id && <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse"></span>}
                 </button>
               ))}
             </div>
           </section>
 
           <section>
-            <h2 className="text-[11px] font-black uppercase text-zinc-400 mb-5 tracking-widest flex items-center gap-2">
-              <span className="w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
-              Premium Stickers
+            <h2 className="text-[10px] font-black uppercase text-zinc-500 mb-5 tracking-widest flex items-center gap-2">
+              <span className="w-4 h-px bg-zinc-800"></span> 03. Decals & Stickers
             </h2>
-            <div className="grid grid-cols-5 gap-3">
+            <div className="grid grid-cols-6 gap-2 bg-black/30 p-4 rounded-2xl border border-white/5">
               {STICKERS.map(s => (
                 <button 
-                  key={s}
-                  onClick={() => setActiveSticker(activeSticker === s ? null : s)}
-                  className={`w-full aspect-square text-2xl flex items-center justify-center rounded-2xl border-2 transition-all ${activeSticker === s ? 'bg-rose-50 border-rose-500 scale-110 shadow-lg' : 'bg-zinc-50 border-zinc-100 hover:bg-zinc-100'}`}
+                  key={s} 
+                  onClick={() => setActiveSticker(s)} 
+                  className={`aspect-square text-xl flex items-center justify-center rounded-lg border transition-all ${activeSticker === s ? 'bg-indigo-500 border-indigo-300 scale-110' : 'bg-transparent border-transparent hover:bg-white/5'}`}
                 >
                   {s}
                 </button>
               ))}
             </div>
-            {activeSticker && <p className="text-[10px] font-black text-rose-500 mt-6 animate-pulse uppercase text-center bg-rose-50 py-2 rounded-lg">Tap on the case to place!</p>}
           </section>
 
-          <section className="pt-8 border-t border-zinc-100 space-y-4">
-            <button onClick={() => setStickers([])} className="w-full py-4 text-zinc-400 font-black rounded-2xl text-xs hover:bg-zinc-50 transition-all uppercase tracking-widest">Clear All Design</button>
-            <button className="w-full py-5 bg-rose-500 hover:bg-rose-600 text-white font-black rounded-[2rem] text-sm transition-all shadow-[0_12px_0_#be185d] active:translate-y-2 active:shadow-none uppercase tracking-widest">ORDER MY CASE</button>
-          </section>
+          {selectedSticker && (
+            <section className="bg-zinc-900/50 p-6 rounded-2xl border border-white/5 animate-in fade-in zoom-in duration-200">
+              <div className="flex justify-between items-center mb-5">
+                 <h2 className="text-[10px] font-black uppercase text-indigo-400 tracking-widest">Selected Item: {selectedSticker.char}</h2>
+              </div>
+              <div className="space-y-6">
+                <div>
+                  <div className="flex justify-between text-[9px] font-black text-zinc-500 uppercase mb-2"><span>Scale</span><span>{Math.round(selectedSticker.scale * 100)}%</span></div>
+                  <input type="range" min="0.5" max="3.0" step="0.1" value={selectedSticker.scale} onChange={e => updateSelectedSticker({ scale: parseFloat(e.target.value) })} className="w-full h-1 bg-zinc-800 rounded-full appearance-none accent-indigo-500" />
+                </div>
+                <div>
+                  <div className="flex justify-between text-[9px] font-black text-zinc-500 uppercase mb-2"><span>Rotate</span><span>{selectedSticker.rotation}°</span></div>
+                  <input type="range" min="-180" max="180" value={selectedSticker.rotation} onChange={e => updateSelectedSticker({ rotation: parseInt(e.target.value) })} className="w-full h-1 bg-zinc-800 rounded-full appearance-none accent-indigo-500" />
+                </div>
+                <button onClick={removeSelected} className="w-full py-3 bg-rose-500/10 text-rose-500 rounded-xl font-black text-[10px] hover:bg-rose-500 hover:text-white transition-all uppercase tracking-widest">Delete Element</button>
+              </div>
+            </section>
+          )}
+
+          <div className="pt-6 border-t border-white/5">
+            <button className="w-full py-5 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-2xl text-[11px] transition-all shadow-xl uppercase tracking-widest italic">Place Order / Save</button>
+          </div>
         </div>
       </aside>
 
-      {/* Main Preview Area */}
-      <main className="flex-1 relative flex items-center justify-center p-16 overflow-hidden">
-        {/* Decorative Background Elements */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-rose-400 opacity-10 blur-[120px] animate-pulse rounded-full"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-400 opacity-10 blur-[120px] animate-pulse delay-1000 rounded-full"></div>
-
-        <div className="relative group perspective-1000">
-          {/* Subtle Reflection Overlay */}
-          <div className="absolute inset-0 z-20 pointer-events-none rounded-[55px] bg-gradient-to-br from-white/20 via-transparent to-black/10"></div>
-          
-          {/* Phone Frame Design */}
+      {/* Main Studio View */}
+      <main className="flex-1 relative flex flex-col items-center justify-center p-10 bg-[#070708]">
+        {/* Cinematic Backdrop */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-600/5 blur-[120px] rounded-full pointer-events-none" />
+        
+        <div className="relative">
+          {/* Smartphone Hardware Body */}
           <div 
             onClick={addSticker}
-            className={`w-[340px] h-[680px] rounded-[55px] border-[14px] border-zinc-900 shadow-[0_60px_100px_-20px_rgba(0,0,0,0.3)] relative overflow-hidden transition-all duration-700 cursor-crosshair transform hover:scale-[1.02] group-hover:rotate-x-2 group-hover:rotate-y-2`}
+            className={`w-[300px] h-[610px] rounded-[50px] border-[10px] border-[#1a1a1c] shadow-[0_50px_100px_-20px_rgba(0,0,0,1)] relative overflow-hidden transition-all duration-700 cursor-crosshair transform hover:scale-[1.01]`}
             style={{ backgroundColor: caseColor }}
           >
-            {/* Camera Module - Modern Style */}
-            <div className="absolute top-10 left-10 w-24 h-36 bg-zinc-900/90 rounded-[35px] p-5 flex flex-col gap-6 shadow-inner z-30">
-              <div className="w-full aspect-square bg-gradient-to-br from-zinc-800 to-black rounded-full border border-white/5 flex items-center justify-center">
-                 <div className="w-4 h-4 bg-blue-900/30 rounded-full blur-[1px]"></div>
+            {/* Minimalist Camera Island */}
+            <div className="absolute top-8 left-8 w-20 h-32 bg-[#000000] rounded-[28px] p-4 flex flex-col gap-4 shadow-2xl z-40 border border-white/10">
+              <div className="w-full aspect-square bg-[#08080a] rounded-full border border-white/5 flex items-center justify-center shadow-inner relative overflow-hidden">
+                 <div className="w-4 h-4 bg-indigo-500/10 rounded-full border border-indigo-400/20"></div>
+                 <div className="absolute top-1 right-1 w-2 h-2 bg-white/5 rounded-full blur-[1px]"></div>
               </div>
-              <div className="w-full aspect-square bg-gradient-to-br from-zinc-800 to-black rounded-full border border-white/5 flex items-center justify-center">
-                 <div className="w-4 h-4 bg-blue-900/30 rounded-full blur-[1px]"></div>
-              </div>
+              <div className="w-full aspect-square bg-[#08080a] rounded-full border border-white/5 shadow-inner"></div>
             </div>
 
-            {/* Logo Silhouette (Subtle) */}
-            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 text-black/10 text-xl font-black tracking-widest uppercase italic">PREMIUM</div>
+            {/* Premium Material Overlay */}
+            <div className={`absolute inset-0 pointer-events-none transition-all duration-500 z-10 ${material.style}`}></div>
 
-            {/* Material Effects Overlay */}
-            <div className={`absolute inset-0 pointer-events-none transition-all duration-500 z-10 ${material.style}`}>
-                {material.id === 'GLOSSY' && (
-                    <div className="absolute top-0 left-0 w-full h-[200%] bg-gradient-to-b from-white/10 via-transparent to-transparent -translate-y-1/2 rotate-12"></div>
-                )}
-            </div>
-
-            {/* Placed Stickers */}
+            {/* Sticker Rendering */}
             {stickers.map(s => (
               <div 
                 key={s.id}
-                onClick={(e) => { e.stopPropagation(); removeSticker(s.id); }}
-                className="absolute text-5xl transform -translate-x-1/2 -translate-y-1/2 cursor-pointer hover:scale-125 hover:rotate-12 transition-all drop-shadow-[0_8px_12px_rgba(0,0,0,0.25)] z-40 active:scale-90"
+                onClick={(e) => { e.stopPropagation(); setSelectedStickerId(s.id); }}
+                className={`absolute text-6xl transform -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-all duration-75 select-none z-30 ${selectedStickerId === s.id ? 'ring-2 ring-indigo-500 ring-offset-4 ring-offset-transparent' : 'hover:scale-110'}`}
                 style={{ 
                   left: s.x, 
                   top: s.y, 
-                  transform: `translate(-50%, -50%) rotate(${s.rotation}deg) scale(${s.scale})` 
+                  transform: `translate(-50%, -50%) rotate(${s.rotation}deg) scale(${s.scale})`,
+                  filter: 'drop-shadow(0 10px 15px rgba(0,0,0,0.5))'
                 }}
               >
                 {s.char}
               </div>
             ))}
           </div>
-
-          {/* Floor Shadow Decoration */}
-          <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-48 h-10 bg-black/10 blur-2xl rounded-full"></div>
+          
+          {/* Shadow beneath the case */}
+          <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-[70%] h-8 bg-black/60 blur-3xl rounded-full"></div>
         </div>
-        
-        {/* Floating Indicator */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-white/80 backdrop-blur-xl border border-zinc-200 px-6 py-3 rounded-full shadow-lg pointer-events-none animate-bounce">
-            <span className="w-2 h-2 bg-rose-500 rounded-full animate-ping"></span>
-            <span className="text-[11px] font-black uppercase text-zinc-500 tracking-widest">Real-time Design Preview Mode</span>
+
+        {/* Dynamic Studio Tip */}
+        <div className="absolute bottom-10 bg-white/5 border border-white/10 px-8 py-3 rounded-full backdrop-blur-xl transition-all">
+           <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">
+             {activeSticker ? `Applying Sticker: ${activeSticker}` : 'Select a sticker to decorate'}
+           </p>
         </div>
       </main>
-
+      
       <style>{`
-        .perspective-1000 { perspective: 1400px; }
-        .rotate-x-2 { transform: rotateX(2deg); }
-        .rotate-y-2 { transform: rotateY(2deg); }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
       `}</style>
     </div>
   );

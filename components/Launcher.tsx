@@ -9,6 +9,47 @@ interface LauncherProps {
 }
 
 const GameThumbnail: React.FC<{ appId: AppRoute }> = ({ appId }) => {
+  if (appId === AppRoute.AI_DETECTIVE) {
+    return (
+      <div className="w-full h-full relative bg-slate-900 flex items-center justify-center overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.2),transparent)]" />
+          <div className="flex flex-col items-center gap-3">
+             <span className="text-8xl drop-shadow-[0_10px_30px_rgba(59,130,246,0.5)]">🔦</span>
+             <div className="flex gap-1.5 animate-pulse">
+                <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                <div className="w-2 h-2 bg-blue-500 rounded-full [animation-delay:0.2s]" />
+                <div className="w-2 h-2 bg-blue-500 rounded-full [animation-delay:0.4s]" />
+             </div>
+          </div>
+          <div className="absolute bottom-4 text-blue-400 font-black text-[10px] uppercase tracking-[0.3em] shadow-black drop-shadow-lg italic">Bureau of AI Investigation</div>
+      </div>
+    );
+  }
+  if (appId === AppRoute.AI_CHAT) {
+    return (
+      <div className="w-full h-full relative bg-blue-600 flex items-center justify-center overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-blue-400 rounded-full blur-[60px] opacity-50" />
+          <span className="text-8xl filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.3)]">💬</span>
+          <div className="absolute top-4 right-4 bg-white text-blue-600 px-3 py-1 rounded-lg text-[10px] font-black uppercase shadow-xl">Smart Gemini</div>
+      </div>
+    );
+  }
+  if (appId === AppRoute.AI_WRITER) {
+    return (
+      <div className="w-full h-full relative bg-violet-600 flex items-center justify-center overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.2)_0%,transparent_70%)]" />
+          <div className="flex flex-col items-center gap-4">
+            <span className="text-8xl drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)]">🖋️</span>
+            <div className="flex gap-2">
+               <div className="w-8 h-2 bg-white/20 rounded-full animate-pulse" />
+               <div className="w-12 h-2 bg-white/40 rounded-full animate-pulse [animation-delay:0.2s]" />
+               <div className="w-6 h-2 bg-white/20 rounded-full animate-pulse [animation-delay:0.4s]" />
+            </div>
+          </div>
+          <div className="absolute bottom-4 text-white font-black text-xs uppercase tracking-widest drop-shadow-md">Professional Writing AI</div>
+      </div>
+    );
+  }
   if (appId === AppRoute.SHAPE_STACKER) {
     return (
       <div className="w-full h-full relative bg-amber-400 flex items-center justify-center overflow-hidden">

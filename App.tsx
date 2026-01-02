@@ -11,6 +11,9 @@ import { PhoneCaseApp } from './apps/Efficiency/PhoneCaseApp';
 import { SlimeRPG } from './apps/Game/SlimeRPG';
 import { BlueScreen } from './apps/Efficiency/BlueScreen';
 import { ShapeStacker } from './apps/Game/ShapeStacker';
+import { AIWriter } from './apps/Efficiency/AIWriter';
+import { GeminiChat } from './apps/GeminiChat/GeminiChat';
+import { AIDetective } from './apps/GeminiChat/AIDetective';
 import { Header, Navbar, Footer } from './components/Layout';
 import { AppRoute, AppCategory } from './types';
 
@@ -49,6 +52,12 @@ const App: React.FC = () => {
         return <BlueScreen onBack={() => setCurrentRoute(AppRoute.LAUNCHER)} />;
       case AppRoute.SHAPE_STACKER:
         return <ShapeStacker onBack={() => setCurrentRoute(AppRoute.LAUNCHER)} />;
+      case AppRoute.AI_WRITER:
+        return <AIWriter onBack={() => setCurrentRoute(AppRoute.LAUNCHER)} />;
+      case AppRoute.AI_CHAT:
+        return <GeminiChat onBack={() => setCurrentRoute(AppRoute.LAUNCHER)} />;
+      case AppRoute.AI_DETECTIVE:
+        return <AIDetective onBack={() => setCurrentRoute(AppRoute.LAUNCHER)} />;
       default:
         return <Launcher onLaunch={setCurrentRoute} selectedCategory={currentCategory} />;
     }
